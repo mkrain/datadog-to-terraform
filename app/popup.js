@@ -55,7 +55,7 @@ function copyResultToClipboard() {
   if (!navigator.clipboard) {
     document.execCommand("copy");
   } else{
-      navigator.clipboard.writeText(text_to_copy).then(
+      navigator.clipboard.writeText(copyText).then(
         s => {
           console.log(`Copied to clipboard`);
         })
