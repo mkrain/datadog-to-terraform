@@ -6,11 +6,23 @@ function onClick() {
   var datadogJson = document.getElementById("datadogJson").value;
 
   try {
-    if (!resourceName) throw "No resource name given";
-    if (!datadogJson) throw "No Datadog JSON given";
+    if (!resourceName) {
+      const regex = /(\W|\s)/ig;
+      resourceName =  
+        `dashboard_${new Date().toISOString().replaceAll(regex, "_")}`;
+
+      console.log(`Using default resource name: ${resourceName}`);
+      document.getElementById("resourceName").value = resourceName;
+    }
+
+    if (!datadogJson) {
+      updateStatusMessage("No Datadog JSON given", true);
+      return;
+    };
 
     var terraformCode;
     let parsedJson = JSON.parse(datadogJson);
+
     if (parsedJson.hasOwnProperty("name")) {
       terraformCode = generateTerraformCode(resourceName, parsedJson);
     } else {
@@ -20,6 +32,7 @@ function onClick() {
     addDomElementsForResult(terraformCode);
     copyResultToClipboard();
     updateStatusMessage("Copied to clipboard!", false);
+    
   } catch (e) {
     updateStatusMessage(e, true);
   }
@@ -38,7 +51,18 @@ function addDomElementsForResult(terraformAlarmCode) {
 function copyResultToClipboard() {
   var copyText = document.getElementById("result");
   copyText.select();
-  document.execCommand("copy");
+
+  if (!navigator.clipboard) {
+    document.execCommand("copy");
+  } else{
+      navigator.clipboard.writeText(text_to_copy).then(
+        s => {
+          console.log(`Copied to clipboard`);
+        })
+        .catch(e => {
+          console.error(`Copied to clipboard failed ${e}`);
+        });
+  }    
 }
 
 function updateStatusMessage(message, isError) {
