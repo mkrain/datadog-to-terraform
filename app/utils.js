@@ -42,6 +42,10 @@ export function blockList(array, blockName, contentConverter) {
 }
 
 export function convertFromDefinition(definitionSet, k, v) {
-  if (typeof definitionSet[k] !== "function") throw `Can't convert key '${k}'`;
+  if (typeof definitionSet[k] !== "function") {
+    const message = `Can't convert key '${k}' for '${definitionSet.toString().match(/ (\w+)/)[1]}' with value ${JSON.stringify(v)}`;
+    console.log(`${message}`);
+    return "";
+  };
   return definitionSet[k](v);
 }
